@@ -46,7 +46,7 @@ def minimize_method(points, options={}):
         return cdist([x], points).sum()
 
     # initial guess: centroid
-    centroid = points.mean(axis=0)
+    centroid = np.array(points).astype(np.float).mean(axis=0)
 
     optimize_result = minimize(aggregate_distance, centroid, method='COBYLA')
 
@@ -57,6 +57,7 @@ def weiszfeld_method(points, options={}):
     """
     Weiszfeld's algorithm as described on Wikipedia.
     """
+    points= np.array(points).astype(np.float)
 
     default_options = {'maxiter': 1000, 'tol': 1e-7}
     default_options.update(options)
@@ -66,7 +67,7 @@ def weiszfeld_method(points, options={}):
         return cdist([x], points)
 
     # initial guess: centroid
-    guess = points.mean(axis=0)
+    guess = np.array(points).astype(np.float).mean(axis=0)
 
     iters = 0
 
@@ -96,6 +97,15 @@ _methods = {
     'weiszfeld': weiszfeld_method,
 }
 
+def geometricCenter(points,VOTER_NUM):
+    lat_sum = 0
+    long_sum = 0
+    for i in range(VOTER_NUM):
+        lat_sum +=points[0,i]
+        long_sum +=points[1,i]
+    lat_mean = lat_sum/VOTER_NUM
+    long_mean = long_sum/VOTER_NUM
+    return [lat_mean, long_mean]
 
 def getDistance (point1, point2):
     distance = np.sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)
@@ -108,4 +118,4 @@ def findField(median):
         distanceList[i] = getDistance(dianPingFields[i,1], median)
     dist = np.column_stack((idx, distanceList))
     dist_cmp = dist[np.argsort(dist[:, 1])]
-    return dist_cmp[0:2,0]
+    return dist_cmp[0:3,0]

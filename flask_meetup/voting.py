@@ -3,21 +3,6 @@ import numpy as np
 CUISINE_NUM = 16
 
 
-#price_majority
-def majority_element(pricelist):
-        idx, ctr = 0, 1
-        
-        for i in range(1, len(pricelist)):
-            if pricelist[idx] == pricelist[i]:
-                ctr += 1
-            else:
-                ctr -= 1
-                if ctr == 0:
-                    idx = i
-                    ctr = 1
-        
-        return pricelist[idx]
-
 #Dislike algorithm
 def dislike(df, CUSINE_NUM, VOTER_NUM):
     dislikeList = np.zeros(CUSINE_NUM)
@@ -26,7 +11,7 @@ def dislike(df, CUSINE_NUM, VOTER_NUM):
         for m in range(CUSINE_NUM):
             if df.iloc[m,i+1] == -1:
                 dislikeList[m] =-1
-    for i in range(len(CUSINE_NUM)):
+    for i in range(CUSINE_NUM):
         if dislikeList[i]==-1:
             dislike.append(i)
     return dislike
@@ -42,14 +27,6 @@ def borda (df, OUTPUT, CUSINE_NUM, VOTER_NUM):
         for i in range(VOTER_NUM):
             if df.iloc[m,i+1] == 2:
                 firstChoice[m] += 1
-    plurality = np.argmax(firstChoice)
-    
-    majorityCriterion = False
-    for i in bordaList:
-        if i == plurality:
-            majorityCriterion = True
-    if majorityCriterion == False:
-        bordaList[OUTPUT-1]=plurality
     return bordaList
 
 #Copeland's Method Algorithm
@@ -73,19 +50,27 @@ def copeland (CUSINE_NUM, VOTER_NUM, df):
             CUS_SMALL = unknown
     return CUS_BIG
 
-def cusine(bordaList, CUS_BIG, dislike):
+def cuisine(bordaList, CUS_BIG, dislike):
     cusList=bordaList
+    print(cusList, CUS_BIG)
 
     inList= False
     for i in bordaList:
         if i==CUS_BIG:
             inList=True
     if inList:
+        pass
+    else:
         cusList[-1]=CUS_BIG
-    for i in dislike:
-        if i.isin(cusList):
-            cusList2 = cusList.remove(i)
-    if cusList2 <3:
+    
+    cusList=pd.Series(cusList)
+    isDislike=[False,False,False,False,False]
+    for i in range(5):
+        for m in cusList:
+            if i==m:
+                isDislike[i]=True
+    cusList2 = cusList[isDislike]
+    if len(cusList2) <3:
         return cusList
     else:
         return cusList2
